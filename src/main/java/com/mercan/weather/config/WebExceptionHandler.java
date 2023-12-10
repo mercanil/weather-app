@@ -19,6 +19,12 @@ import java.util.stream.Collectors;
 public class WebExceptionHandler {
 
 
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<String> handleNotFound(EntityNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    
     @ExceptionHandler({SensorNotFound.class})
     public ResponseEntity<ApiError> handleNotFounds(Exception e) {;
         ApiError build = new ApiError(HttpStatus.NOT_FOUND.name() ,e.getMessage());

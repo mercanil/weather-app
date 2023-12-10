@@ -15,9 +15,9 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   datasource:
-    url:  ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url:   jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: mysecretpassword
     driver-class-name: org.postgresql.Driver
 springdoc:
   api-docs:

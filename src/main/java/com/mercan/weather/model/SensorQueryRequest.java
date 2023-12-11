@@ -8,10 +8,9 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
-import static com.mercan.weather.model.AppConstants.*;
+import static com.mercan.weather.model.AppConstants.Statistic;
 
 
 @Data
@@ -20,10 +19,10 @@ import static com.mercan.weather.model.AppConstants.*;
 @Builder(toBuilder = true)
 public class SensorQueryRequest implements Serializable {
 
-    private List<String> sensorIds;
-    private List<Metric> metrics;
+    private List<UUID> sensorIds;
+    private List<AppConstants.Metric> metrics;
     private Statistic statistic;
-    private Optional<Date> startDate;
-    private Optional<Date> endDate;
+    private Date startDate;
+    private Date endDate;
 
 }

@@ -1,6 +1,7 @@
 package com.mercan.weather.service;
 
 import com.mercan.weather.entity.Sensor;
+import com.mercan.weather.exception.SensorNotFound;
 import com.mercan.weather.repository.SensorRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,10 +41,18 @@ public class SensorService {
         return sensorRepository.findAll();
     }
 
-    public Sensor updateSensor(UUID sensorId, Sensor sensor) {
-        if(!sensorId.equals(sensor.getId())){
+    public Sensor updateSensor(UUID sensorId, Sensor sensor) throws SensorNotFound {
+
+        if (!sensorId.equals(sensor.getId())) {
             log.info("invalid parameter");
-            return  null;
+            throw new IllegalArgumentException("sensor id and body does not match");
+        }
+
+        Optional<Sensor> byId = sensorRepository.findById(sensorId);
+
+        if (byId.isEmpty()) {
+            log.error("unable to find with sensor id {}", sensorId);
+            throw new SensorNotFound("unable to find with sensor id " + sensorId);
         }
 
         return sensorRepository.save(sensor);

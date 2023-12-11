@@ -3,6 +3,7 @@ package com.mercan.weather.config;
 import com.mercan.weather.exception.ApiError;
 import com.mercan.weather.exception.QueryValidatorException;
 import com.mercan.weather.exception.SensorNotFound;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

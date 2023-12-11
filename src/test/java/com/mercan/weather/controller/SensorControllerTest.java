@@ -1,75 +1,83 @@
 package com.mercan.weather.controller;
 
 import com.mercan.weather.entity.Sensor;
+import com.mercan.weather.exception.SensorNotFound;
 import com.mercan.weather.service.SensorService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
-class SensorControllerTest {
+@ExtendWith(SpringExtension.class)
+public class SensorControllerTest {
+
     @Mock
     private SensorService sensorService;
+
     @InjectMocks
     private SensorController sensorController;
+
     private Sensor sensor;
-    private final UUID sensorId = UUID.randomUUID();
+    private UUID sensorId;
 
     @BeforeEach
     void setUp() {
         sensor = new Sensor();
+        sensorId = UUID.randomUUID();
         sensor.setId(sensorId);
+        sensor.setName("test-sensor");
     }
 
     @Test
-    void testGetAllSensors() {
-        when(sensorService.getAllSensors()).thenReturn(Arrays.asList(sensor));
-        List sensors = sensorController.getAllSensors();
-        assertFalse(sensors.isEmpty());
-        verify(sensorService).getAllSensors();
+    void createSensorTest() {
+        when(sensorService.createSensor(any(Sensor.class))).thenReturn(sensor);
+
+        Sensor result = sensorController.createSensor(sensor).getBody();
+
+        assertEquals(sensorId, result.getId());
+        verify(sensorService).createSensor(sensor);
     }
 
     @Test
-    void testGetSensorByIdFound() {
-        when(sensorService.getSensor(sensorId)).thenReturn(Optional.of(sensor));
-        ResponseEntity response = sensorController.getSensorById(sensorId);
+    void updateSensorTest() throws SensorNotFound {
+        when(sensorService.updateSensor(eq(sensorId), any(Sensor.class))).thenReturn(sensor);
+
+        Sensor result = sensorController.updateSensor(sensorId, sensor).getBody();
+
+        assertEquals(sensorId, result.getId());
+        verify(sensorService).updateSensor(sensorId, sensor);
+    }
+
+    @Test
+    void deleteSensorTest() {
+        doNothing().when(sensorService).deleteSensor(sensorId);
+
+        ResponseEntity<Void> response = sensorController.deleteSensor(sensorId);
+
         assertEquals(OK, response.getStatusCode());
-        verify(sensorService).getSensor(sensorId);
+        verify(sensorService).deleteSensor(sensorId);
     }
 
     @Test
-    void testGetSensorByIdNotFound() {
+    void getSensorByIdNotFoundTest() {
         when(sensorService.getSensor(sensorId)).thenReturn(Optional.empty());
-        ResponseEntity response = sensorController.getSensorById(sensorId);
+
+        ResponseEntity<Sensor> response = sensorController.getSensorById(sensorId);
+
         assertEquals(NOT_FOUND, response.getStatusCode());
         verify(sensorService).getSensor(sensorId);
     }
 
-    @Test
-    void testCreateOrUpdateSensor() {
-        when(sensorService.createOrUpdateSensor(sensor)).thenReturn(sensor);
-        Sensor result = sensorController.createOrUpdateSensor(sensor);
-        assertEquals(sensorId, result.getId());
-        verify(sensorService).createOrUpdateSensor(sensor);
-    }
 
-    @Test
-    void testDeleteSensor() {
-        ResponseEntity response = sensorController.deleteSensor(sensorId);
-        assertEquals(OK, response.getStatusCode());
-        verify(sensorService).deleteSensor(sensorId);
-    }
 }

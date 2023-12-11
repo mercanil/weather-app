@@ -1,7 +1,10 @@
 package com.mercan.weather.repository;
 
 import com.mercan.weather.entity.Reading;
-import com.mercan.weather.model.*;
+import com.mercan.weather.model.AppConstants;
+import com.mercan.weather.model.MetricFilter;
+import com.mercan.weather.model.MetricStatistic;
+import com.mercan.weather.model.SensorQueryResponse;
 import com.mercan.weather.service.QueryBuilder;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
@@ -10,7 +13,6 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -41,7 +43,7 @@ public class SensorReadingRepository {
         List<Selection> selections = new ArrayList<>();
 
 
-        List<MetricQuery> metricQueries = new ArrayList<>();
+        List<MetricFilter> metricQueries = new ArrayList<>();
         for (String metric : metrics) {
             selections.add(QueryBuilder.createSelection(root, criteriaBuilder, AppConstants.Statistic.valueOf(statistic), AppConstants.Metric.valueOf(metric), metricQueries));
         }
@@ -54,19 +56,25 @@ public class SensorReadingRepository {
             startDate.ifPresent(start -> predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get(AppConstants.READING_COLUMN_NAME), start)));
             endDate.ifPresent(end -> predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get(AppConstants.READING_COLUMN_NAME), end)));
             criteriaQuery.where(predicates.toArray(new Predicate[0]));
-            TypedQuery query = entityManager.createQuery(criteriaQuery);
-            Tuple result = (Tuple) query.getSingleResult();
-            List<StatisticModel> statisticModels = new ArrayList<>();
+            TypedQuery<Tuple> query = entityManager.createQuery(criteriaQuery);
 
-            for (MetricQuery metricQuery : metricQueries) {
+            List<Tuple> results = query.getResultList();
+
+            if (results.isEmpty()) {
+                return Collections.emptyList();
+            }
+
+            List<MetricStatistic> metricStatistics = new ArrayList<>();
+
+            for (MetricFilter metricFilter : metricQueries) {
                 HashMap<String, String> metricResult = new HashMap<>();
-                metricResult.put(metricQuery.getMetric(), result.get(metricQuery.getMetricAlias()).toString());
-                statisticModels.add(StatisticModel.builder().metric(metricQuery.getMetricField().toString()).values(metricResult).build());
+                metricResult.put(metricFilter.getMetric(), results.get(0).get(metricFilter.getMetricAlias()).toString());
+                metricStatistics.add(MetricStatistic.builder().metric(metricFilter.getMetricField().toString()).values(metricResult).build());
             }
 
             SensorQueryResponse response = new SensorQueryResponse();
             response.setSensorId(sensorId);
-            response.setStatistics(statisticModels);
+            response.setStatistics(metricStatistics);
             queryResponseList.add(response);
         }
         return queryResponseList;

@@ -1,9 +1,11 @@
 package com.mercan.weather.controller;
 
 import com.mercan.weather.entity.Sensor;
+import com.mercan.weather.exception.SensorNotFound;
 import com.mercan.weather.service.SensorService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,14 +36,14 @@ public class SensorController {
 
     @Operation(summary = "Add a sensor")
     @PostMapping
-    public Sensor createSensor(@RequestBody Sensor sensor) {
-        return sensorService.createSensor(sensor);
+    public ResponseEntity<Sensor> createSensor(@RequestBody Sensor sensor) {
+        return new ResponseEntity<>(sensorService.createSensor(sensor), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Update a sensor")
     @PutMapping("/{id}")
-    public Sensor updateSensor(@PathVariable(value = "id") UUID sensorId, @RequestBody Sensor sensor) {
-        return sensorService.updateSensor(sensorId, sensor);
+    public ResponseEntity<Sensor> updateSensor(@PathVariable(value = "id") UUID sensorId, @RequestBody Sensor sensor) throws SensorNotFound {
+        return new ResponseEntity<>(sensorService.updateSensor(sensorId, sensor), HttpStatus.OK);
 
     }
 

@@ -17,7 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class SensorReadingRequest {
-    @NotBlank UUID sensor;
+    @NotBlank UUID sensorId;
     @NotNull @DecimalMin(value = "-100") @DecimalMax(value = "100") double temperature;
     @NotNull @DecimalMin(value = "0") @DecimalMax(value = "100") double humidity;
     @NotNull @DecimalMin(value = "0") @DecimalMax(value = "500") double windSpeed;

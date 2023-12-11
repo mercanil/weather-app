@@ -1,19 +1,15 @@
 package com.mercan.weather.service;
 
-import com.mercan.weather.model.MetricQuery;
 import com.mercan.weather.entity.Reading;
-import com.mercan.weather.model.*;
+import com.mercan.weather.model.SensorQueryResponse;
+import com.mercan.weather.model.SensorQueryResponseWrapper;
+import com.mercan.weather.model.SensorReadingRequest;
 import com.mercan.weather.repository.SensorReadingRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.Tuple;
-import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -25,7 +21,7 @@ public class SensorReadingService {
 
     public Reading createReading(SensorReadingRequest dto) {
 
-        Reading reading = Reading.builder().id(UUID.randomUUID()).sensorId(dto.getSensor()).temperature(dto.getTemperature()).humidity(dto.getHumidity()).windSpeed(dto.getWindSpeed()).readingTime(new Timestamp(System.currentTimeMillis())).build();
+        Reading reading = Reading.builder().id(UUID.randomUUID()).sensorId(dto.getSensorId()).temperature(dto.getTemperature()).humidity(dto.getHumidity()).windSpeed(dto.getWindSpeed()).readingTime(new Timestamp(System.currentTimeMillis())).build();
         sensorReadingRepository.save(reading);
         log.info(String.format("Weather created with id='%s'", reading.getId()));
         return reading;

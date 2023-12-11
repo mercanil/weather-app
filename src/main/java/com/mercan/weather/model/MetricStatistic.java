@@ -7,7 +7,7 @@ import java.util.Map;
 
 @Data
 @Builder
-public class StatisticModel {
+public class MetricStatistic {
     private String metric;
     private Map<String, String> values;
 }

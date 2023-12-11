@@ -8,5 +8,5 @@ import java.util.UUID;
 @Data
 public class SensorQueryResponse {
     private UUID sensorId;
-    private List<StatisticModel> statistics;
+    private List<MetricStatistic> statistics;
 }

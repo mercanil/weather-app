@@ -27,9 +27,7 @@ public class SensorReadingRepositoryImpl {
         entityManager.persist(reading);
     }
 
-    public List<SensorQueryResponse> query(Set<UUID> sensorIds, List<AppConstants.Metric> metrics,
-                                           AppConstants.Statistic statisticOpt, Optional<Date> startDate,
-                                           Optional<Date> endDate) {
+    public List<SensorQueryResponse> query(Set<UUID> sensorIds, List<AppConstants.Metric> metrics, AppConstants.Statistic statisticOpt, Optional<Date> startDate, Optional<Date> endDate) {
         List<SensorQueryResponse> queryResponseList = new ArrayList<>();
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Tuple> criteriaQuery = criteriaBuilder.createTupleQuery();
@@ -61,8 +59,7 @@ public class SensorReadingRepositoryImpl {
 
     }
 
-    private Predicate buildPredicate(Root<Reading> root, CriteriaBuilder criteriaBuilder, UUID sensorId,
-                                     Optional<Date> startDateOpt, Optional<Date> endDateOpt) {
+    private Predicate buildPredicate(Root<Reading> root, CriteriaBuilder criteriaBuilder, UUID sensorId, Optional<Date> startDateOpt, Optional<Date> endDateOpt) {
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(criteriaBuilder.equal(root.get(AppConstants.SENSOR_ID_COLUMN_NAME), sensorId));
         startDateOpt.ifPresent(date -> predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get(AppConstants.READING_COLUMN_NAME), date)));
@@ -71,7 +68,6 @@ public class SensorReadingRepositoryImpl {
     }
 
     private SensorQueryResponse processResult(List<Tuple> results, List<MetricFilter> metricFilters, UUID sensorId) {
-        SensorQueryResponse response = new SensorQueryResponse();
         List<MetricStatistic> metricStatistics = new ArrayList<>();
         for (MetricFilter metricFilter : metricFilters) {
             HashMap<String, String> metricResult = new HashMap<>();
@@ -81,9 +77,24 @@ public class SensorReadingRepositoryImpl {
             }
         }
 
+        return SensorQueryResponse.builder().sensorId(sensorId).statistics(metricStatistics).build();
+    }
 
-        response.setSensorId(sensorId);
-        response.setStatistics(metricStatistics);
-        return response;
+    public List<SensorQueryResponse> fetchLatestData(Set<UUID> sensorIds) {
+        List<SensorQueryResponse> queryResponseList = new ArrayList<>();
+        for (UUID sensorId : sensorIds) {
+            List resultList = entityManager.createQuery("SELECT r from Reading r where sensorId = :sensorId order by readingTime").setParameter("sensorId", sensorId).setMaxResults(1).getResultList();
+            for (Object r : resultList) {
+                Reading reading = (Reading) r;
+                SensorQueryResponse response = SensorQueryResponse.builder()
+                        .sensorId(sensorId)
+                        .temperature(reading.getTemperature())
+                        .humidity(reading.getHumidity())
+                        .windSpeed(reading.getWindSpeed())
+                        .build();
+                queryResponseList.add(response);
+            }
+        }
+        return queryResponseList;
     }
 }

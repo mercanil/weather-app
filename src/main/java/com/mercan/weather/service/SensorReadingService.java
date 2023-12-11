@@ -46,8 +46,13 @@ public class SensorReadingService {
         SensorQueryResponseWrapper responseWrapper = new SensorQueryResponseWrapper();
         Set<UUID> sensorIds = sensorIdOpt.orElse(retrieveAllSensorIds());
         boolean onlyLatestData = startDate.isEmpty() && endDate.isEmpty();
-        List<SensorQueryResponse> result = new ArrayList<>();
-        result = sensorReadingRepositoryImpl.query(sensorIds, metrics, statistic, startDate, endDate);
+        List<SensorQueryResponse> result;
+
+        if (onlyLatestData) {
+            result = sensorReadingRepositoryImpl.fetchLatestData(sensorIds);
+        } else {
+            result = sensorReadingRepositoryImpl.query(sensorIds, metrics, statistic, startDate, endDate);
+        }
         responseWrapper.setStartDate(startDate.orElse(null));
         responseWrapper.setEndDate(endDate.orElse(null));
         responseWrapper.setResult(result);

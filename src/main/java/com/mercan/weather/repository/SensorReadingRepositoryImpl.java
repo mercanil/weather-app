@@ -71,7 +71,7 @@ public class SensorReadingRepositoryImpl {
         List<MetricStatistic> metricStatistics = new ArrayList<>();
         for (MetricFilter metricFilter : metricFilters) {
             HashMap<String, String> metricResult = new HashMap<>();
-            if (results.get(0).get(metricFilter.getMetricAlias()) != null) {
+            if (results.get(0) != null && results.get(0).get(metricFilter.getMetricAlias()) != null) {
                 metricResult.put(metricFilter.getMetric(), results.get(0).get(metricFilter.getMetricAlias()).toString());
                 metricStatistics.add(MetricStatistic.builder().metric(metricFilter.getMetricField().toString()).values(metricResult).build());
             }
@@ -80,12 +80,25 @@ public class SensorReadingRepositoryImpl {
         return SensorQueryResponse.builder().sensorId(sensorId).statistics(metricStatistics).build();
     }
 
+
     public List<SensorQueryResponse> fetchLatestData(Set<UUID> sensorIds) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Reading> criteriaQuery = criteriaBuilder.createQuery(Reading.class);
+        Root<Reading> root = criteriaQuery.from(Reading.class);
+
         List<SensorQueryResponse> queryResponseList = new ArrayList<>();
+
         for (UUID sensorId : sensorIds) {
-            List resultList = entityManager.createQuery("SELECT r from Reading r where sensorId = :sensorId order by readingTime").setParameter("sensorId", sensorId).setMaxResults(1).getResultList();
-            for (Object r : resultList) {
-                Reading reading = (Reading) r;
+            criteriaQuery.select(root)
+                    .where(criteriaBuilder.equal(root.get(AppConstants.SENSOR_ID_COLUMN_NAME), sensorId))
+                    .orderBy(criteriaBuilder.desc(root.get(AppConstants.READING_COLUMN_NAME)))
+                    .distinct(true);
+
+            TypedQuery<Reading> query = entityManager.createQuery(criteriaQuery);
+            query.setMaxResults(1);
+
+            List<Reading> resultList = query.getResultList();
+            resultList.forEach(reading -> {
                 SensorQueryResponse response = SensorQueryResponse.builder()
                         .sensorId(sensorId)
                         .temperature(reading.getTemperature())
@@ -93,8 +106,9 @@ public class SensorReadingRepositoryImpl {
                         .windSpeed(reading.getWindSpeed())
                         .build();
                 queryResponseList.add(response);
-            }
+            });
         }
+
         return queryResponseList;
     }
 }

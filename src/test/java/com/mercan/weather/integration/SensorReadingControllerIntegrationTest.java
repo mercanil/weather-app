@@ -1,7 +1,7 @@
 package com.mercan.weather.integration;
 
 import com.mercan.weather.entity.Reading;
-import com.mercan.weather.repository.SensorReadingRepository;
+import com.mercan.weather.repository.SensorReadingRepositoryImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,13 +15,19 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @Testcontainers
 public class SensorReadingControllerIntegrationTest {
 
     @Autowired
-    private SensorReadingRepository sensorReadingRepository;
+    private SensorReadingRepositoryImpl sensorReadingRepositoryImpl;
 
     @Autowired
     private MockMvc mockMvc;
@@ -44,34 +50,57 @@ public class SensorReadingControllerIntegrationTest {
         registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
     }
 
-    private Reading sensorReading;
+    private Reading reading;
 
     @BeforeEach
     public void beforeEach() {
-        sensorReading = sensorReadingRepository.save(createSensorReading());
+        reading = new Reading();
+        // Set properties for sensorReading
+        sensorReadingRepositoryImpl.save(reading);
     }
 
     @AfterEach
     public void afterEach() {
-        sensorReadingRepository.delete(sensorReading);
-    }
-
-    // Test cases
-
-    @Test
-    void createSensorReading_expect_success() throws Exception {
-        // Setup new sensor reading data
-        // Perform mockMvc POST request
-        // Expect successful creation status
+        sensorReadingRepositoryImpl.delete(reading);
     }
 
     @Test
     void querySensorReading_expect_success() throws Exception {
-        // Perform mockMvc GET request with query parameters
-        // Expect successful retrieval status
+        this.mockMvc.perform(get("/api/reading")
+                        .param("sensorIds", reading.getSensorId().toString())
+                        .param("metrics", "temperature,humidity")
+                        .param("statistic", "AVERAGE")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").isArray())
+                .andExpect(jsonPath("$.result[0].sensorId").value(reading.getSensorId().toString()))
+                .andExpect(jsonPath("$.result[0].statistics").isNotEmpty());
     }
 
-    // Additional test cases for update, delete, not found scenarios, etc.
+    @Test
+    void queryAllSensors_expect_success() throws Exception {
+        this.mockMvc.perform(get("/api/reading")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").isArray());
+    }
 
-    // Helper methods for creating test data
+    @Test
+    void queryLatestData_expect_success() throws Exception {
+        this.mockMvc.perform(get("/api/reading")
+                        .param("metrics", "temperature,humidity")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").isArray());
+    }
+
+    // Additional methods for update, delete, etc.
+
+    private static String asJsonString(final Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

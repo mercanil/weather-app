@@ -94,35 +94,7 @@ class SensorReadingControllerTest {
     }
 
     @Test
-    void queryReading_withAllValues_1() throws Exception {
-
-        //given
-        SensorQueryResponseWrapper responseWrapper = new SensorQueryResponseWrapper();
-        Map<String, String> values = new HashMap<>();
-        values.put("AVG", "1");
-        MetricStatistic temperature = MetricStatistic.builder().metric("temperature").values(values).build();
-        List<MetricStatistic> statistics = List.of(temperature);
-        SensorQueryResponse response = SensorQueryResponse.builder().statistics(statistics).build();
-        List<SensorQueryResponse> result = List.of(response);
-        responseWrapper.setResult(result);
-
-        when(sensorReadingService.queryData(any(), any(), any(), any(), any())).thenReturn(responseWrapper);
-
-        mockMvc.perform(get("/api/reading")
-                        //.param("sensorIds", "123e4567-e89b-12d3-a456-426655440000")
-                        .param("metrics", "temperature")
-                        .param("statistic", "AVG")
-                        .param("startDate", "2023-01-01")
-                        .param("endDate", "2023-01-31")
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("result.[0].statistics.[0].values.AVG", is("1")));
-    }
-
-
-    @Test
-    void queryReading_withAllValues_2() throws Exception {
+    void queryReading_when_temperature_avg_requested() throws Exception {
 
         //given
         SensorQueryResponseWrapper responseWrapper = new SensorQueryResponseWrapper();
@@ -149,7 +121,35 @@ class SensorReadingControllerTest {
     }
 
     @Test
-    void queryReading_withoutSensorId_temperature() throws Exception {
+    void queryReading_when_temperature_max_metric_requested() throws Exception {
+
+        //given
+        SensorQueryResponseWrapper responseWrapper = new SensorQueryResponseWrapper();
+        Map<String, String> values = new HashMap<>();
+        values.put("MAX", "1");
+        MetricStatistic temperature = MetricStatistic.builder().metric("temperature").values(values).build();
+        List<MetricStatistic> statistics = List.of(temperature);
+        SensorQueryResponse response = SensorQueryResponse.builder().statistics(statistics).build();
+        List<SensorQueryResponse> result = List.of(response);
+        responseWrapper.setResult(result);
+
+        when(sensorReadingService.queryData(any(), any(), any(), any(), any())).thenReturn(responseWrapper);
+
+        mockMvc.perform(get("/api/reading")
+                        .param("sensorIds", "123e4567-e89b-12d3-a456-426655440000")
+                        .param("metrics", "temperature")
+                        .param("statistic", "AVG")
+                        .param("startDate", "2023-01-01")
+                        .param("endDate", "2023-01-31")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("result.[0].statistics.[0].values.MAX", is("1")));
+    }
+
+
+    @Test
+    void queryReading_when_temperature_requested() throws Exception {
         SensorQueryResponseWrapper responseWrapper = new SensorQueryResponseWrapper();
         SensorQueryResponse response = SensorQueryResponse.builder().temperature(1d).build();
         List<SensorQueryResponse> result = List.of(response);
@@ -161,11 +161,10 @@ class SensorReadingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("result.[0].temperature", is(1.0)));
-        // Passes
     }
 
     @Test
-    void queryReading_withoutSensorId_humidity() throws Exception {
+    void queryReading_when_humidity_requested() throws Exception {
         SensorQueryResponseWrapper responseWrapper = new SensorQueryResponseWrapper();
         SensorQueryResponse response = SensorQueryResponse.builder().humidity(1d).build();
         List<SensorQueryResponse> result = List.of(response);
@@ -177,7 +176,6 @@ class SensorReadingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("result.[0].humidity", is(1.0)));
-        // Passes
     }
 
 }

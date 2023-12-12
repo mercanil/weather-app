@@ -31,9 +31,26 @@ swagger.json: `http://127.0.0.1/api-docs`
 
 swagger-ui: `http://127.0.0.1/swagger-ui.html`
 
-## Database Selection
+## Database Selection TimescaleDB
+
+### Time-Series Data Optimization
+
+TimescaleDB is built on top of PostgreSQL and is optimized for time-series data. This is particularly beneficial for our
+application, which deals extensively with sensor data, inherently time-series in nature.
+
+### Rich Query Capabilities
+
+By inheriting PostgreSQL's features, TimescaleDB allows us to use complex SQL queries, which is crucial for our data
+analysis and reporting needs.
+
+### Compatibility with PostgreSQL
+
+Since TimescaleDB is an extension of PostgreSQL, it allows us to use the vast array of PostgreSQL tools and features,
+while also benefiting from TimescaleDB's time-series functionalities.
 
 ## Missing Parts
+
+TimescaleDB configuration requires more time
 
 ## Next Steps
 

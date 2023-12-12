@@ -4,6 +4,7 @@ compose:
 	docker-compose build
 
 up:
+    mvn install
 	docker-compose up
 
 daemon:

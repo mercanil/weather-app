@@ -5,9 +5,10 @@
 Weather service is an open source platform that enable api for receives weather data from various sensors
 
 ## Usage
-Please make sure you have docker installed in your environment to run this application with given samples
-* Run `mvn install` to generate jar file.
-* Run `make up` to start the application.
+
+Please make sure you have docker and maven installed in your environment to run this application with given samples
+
+* Just run `make up` to start the application.
 * Connect to the API using Postman on port 80.
 
 ## API Endpoints

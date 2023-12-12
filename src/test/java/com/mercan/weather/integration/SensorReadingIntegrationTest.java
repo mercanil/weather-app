@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Testcontainers
-class SensorReadingControllerIntegrationTest {
+class SensorReadingIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;

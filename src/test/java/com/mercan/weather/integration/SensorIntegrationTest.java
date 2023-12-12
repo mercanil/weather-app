@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Testcontainers
-class SensorControllerIntegrationTest {
+class SensorIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;

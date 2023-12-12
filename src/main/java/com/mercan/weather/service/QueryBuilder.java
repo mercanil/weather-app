@@ -17,36 +17,46 @@ public class QueryBuilder {
         MAX("max_");
         public final String prefix;
 
-        private Alias(String prefix) {
+        Alias(String prefix) {
             this.prefix = prefix;
         }
     }
 
-    public static Selection createSelection(Root root, CriteriaBuilder criteriaBuilder, AppConstants.Statistic statistic, AppConstants.Metric metric, List<MetricFilter> metricQueries) {
+    public static Selection<?> createSelection(Root<?> root, CriteriaBuilder criteriaBuilder,
+                                               AppConstants.Statistic statistic, AppConstants.Metric metric,
+                                               List<MetricFilter> metricQueries) {
 
         String metricName = metric.name();
-        switch (statistic) {
-            case SUM -> {
-                String alias = Alias.SUM.prefix + metric;
-                metricQueries.add(MetricFilter.builder().metric("sum").metricAlias(alias).metricField(metric).build());
-                return criteriaBuilder.sum(root.get(metricName)).alias(alias);
-            }
-            case AVERAGE -> {
-                String alias = Alias.AVG.prefix + metric;
-                metricQueries.add(MetricFilter.builder().metric("avg").metricAlias(alias).metricField(metric).build());
-                return criteriaBuilder.avg(root.get(metricName)).alias(alias);
-            }
-            case MIN -> {
-                String alias = Alias.MIN.prefix + metric;
-                metricQueries.add(MetricFilter.builder().metric("min").metricAlias(alias).metricField(metric).build());
-                return criteriaBuilder.min(root.get(metricName)).alias(alias);
-            }
-            case MAX -> {
-                String alias = Alias.MAX.prefix + metric;
-                metricQueries.add(MetricFilter.builder().metric("max").metricAlias(alias).metricField(metric).build());
-                return criteriaBuilder.max(root.get(metricName)).alias(alias);
-            }
-        }
-        return null;
+        String aliasPrefix = getAliasPrefix(statistic);
+        String alias = aliasPrefix + metricName;
+
+        MetricFilter metricFilter = MetricFilter.builder()
+                .metric(statistic.name().toLowerCase())
+                .metricAlias(alias)
+                .metricField(metric)
+                .build();
+        metricQueries.add(metricFilter);
+
+        return getSelectionByStatistic(criteriaBuilder, root, metricName, alias, statistic);
+    }
+
+    private static String getAliasPrefix(AppConstants.Statistic statistic) {
+        return switch (statistic) {
+            case SUM -> Alias.SUM.prefix;
+            case AVERAGE -> Alias.AVG.prefix;
+            case MIN -> Alias.MIN.prefix;
+            case MAX -> Alias.MAX.prefix;
+        };
+    }
+
+    private static Selection<?> getSelectionByStatistic(CriteriaBuilder cb, Root<?> root,
+                                                        String metricName, String alias,
+                                                        AppConstants.Statistic statistic) {
+        return switch (statistic) {
+            case SUM -> cb.sum(root.get(metricName)).alias(alias);
+            case AVERAGE -> cb.avg(root.get(metricName)).alias(alias);
+            case MIN -> cb.min(root.get(metricName)).alias(alias);
+            case MAX -> cb.max(root.get(metricName)).alias(alias);
+        };
     }
 }

@@ -14,12 +14,13 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Transactional
 @Repository
 @RequiredArgsConstructor
-public class SensorReadingRepositoryImpl {
+public class SensorReadingRepository {
 
     private final EntityManager entityManager;
 
@@ -27,7 +28,7 @@ public class SensorReadingRepositoryImpl {
         entityManager.persist(reading);
     }
 
-    public List<SensorQueryResponse> query(Set<UUID> sensorIds, List<AppConstants.Metric> metrics, AppConstants.Statistic statisticOpt, Optional<Date> startDate, Optional<Date> endDate) {
+    public List<SensorQueryResponse> query(Set<UUID> sensorIds, List<AppConstants.Metric> metrics, AppConstants.Statistic statisticOpt, Optional<LocalDate> startDate, Optional<LocalDate> endDate) {
         List<SensorQueryResponse> queryResponseList = new ArrayList<>();
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Tuple> criteriaQuery = criteriaBuilder.createTupleQuery();
@@ -59,7 +60,7 @@ public class SensorReadingRepositoryImpl {
 
     }
 
-    private Predicate buildPredicate(Root<Reading> root, CriteriaBuilder criteriaBuilder, UUID sensorId, Optional<Date> startDateOpt, Optional<Date> endDateOpt) {
+    private Predicate buildPredicate(Root<Reading> root, CriteriaBuilder criteriaBuilder, UUID sensorId, Optional<LocalDate> startDateOpt, Optional<LocalDate> endDateOpt) {
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(criteriaBuilder.equal(root.get(AppConstants.SENSOR_ID_COLUMN_NAME), sensorId));
         startDateOpt.ifPresent(date -> predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get(AppConstants.READING_COLUMN_NAME), date)));

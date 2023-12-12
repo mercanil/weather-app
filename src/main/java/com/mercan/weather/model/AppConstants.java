@@ -9,8 +9,7 @@ public class AppConstants {
         SUM,
         AVERAGE,
         MIN,
-        MAX,
-        LATEST
+        MAX
     }
 
     public enum Metric {

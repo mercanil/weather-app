@@ -1,17 +1,21 @@
 package com.mercan.weather.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class SensorQueryResponseWrapper {
     List<SensorQueryResponse> result;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Date startDate;
+    private LocalDate startDate;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Date endDate;
+    private LocalDate endDate;
 }

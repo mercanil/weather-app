@@ -23,5 +23,5 @@ public class Reading {
     private Double temperature;
     private Double humidity;
     private Double windSpeed;
-    private Timestamp readingTime;
+    private Timestamp time;
 }

@@ -1,7 +1,6 @@
 package com.mercan.weather.controller;
 
 import com.mercan.weather.entity.Reading;
-import com.mercan.weather.model.AppConstants;
 import com.mercan.weather.model.SensorQueryResponseWrapper;
 import com.mercan.weather.model.SensorReadingRequest;
 import com.mercan.weather.service.SensorReadingService;
@@ -21,57 +20,51 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
-
-import static org.springframework.http.ResponseEntity.status;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/reading")
 @RequiredArgsConstructor
 @Validated
 public class SensorReadingController {
+
     private final SensorReadingService sensorReadingService;
 
-
-    @Operation(summary = "create sensor readings", description = "create sensor readings based on given request body")
+    @Operation(summary = "Create Sensor Readings", description = "Create sensor readings based on given request body")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved sensor readings",
+            @ApiResponse(responseCode = "201", description = "Successfully created sensor reading",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = Reading.class))}),
-            @ApiResponse(responseCode = "400", description = "Invalid request parameters",
-                    content = @Content),
-            @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content)
+            @ApiResponse(responseCode = "400", description = "Invalid request parameters", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public @ResponseBody ResponseEntity<Reading> createReading(@Valid @RequestBody SensorReadingRequest dto) {
-        return status(HttpStatus.CREATED).body(sensorReadingService.createReading(dto));
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Reading> createReading(@Valid @RequestBody SensorReadingRequest dto) {
+        Reading createdReading = sensorReadingService.createReading(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdReading);
     }
 
-
-    @Operation(summary = "Query sensor readings", description = "Retrieve sensor readings based on given criteria")
+    @Operation(summary = "Query Sensor Readings", description = "Retrieve sensor readings based on given criteria")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved sensor readings",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = SensorQueryResponseWrapper.class))}),
-            @ApiResponse(responseCode = "400", description = "Invalid request parameters",
-                    content = @Content),
-            @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content)
+            @ApiResponse(responseCode = "400", description = "Invalid request parameters", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public @ResponseBody ResponseEntity<SensorQueryResponseWrapper> query(
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SensorQueryResponseWrapper> query(
             @Parameter(description = "Set of sensor IDs to filter the readings") @RequestParam(required = false) Optional<Set<UUID>> sensorIds,
-            @Parameter(description = "List of metrics to include in the response, e.g., 'temperature', 'humidity'") @RequestParam @NotEmpty List<AppConstants.Metric> metrics,
-            @Parameter(description = "Statistic type for aggregating the data, e.g., 'AVERAGE', 'SUM'") @RequestParam(name = "statistic", defaultValue = "AVG", required = false) AppConstants.Statistic statistic,
-            @Parameter(description = "Start date for filtering the readings") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<Date> startDate,
-            @Parameter(description = "End date for filtering the readings") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<Date> endDate
+            @Parameter(description = "List of metrics to include in the response, e.g., 'temperature', 'humidity'") @RequestParam @NotEmpty List<String> metrics,
+            @Parameter(description = "Statistic type for aggregating the data, e.g., 'AVERAGE', 'SUM'") @RequestParam(name = "statistic", defaultValue = "AVG", required = false) String statistic,
+            @Parameter(description = "Start date for filtering the readings") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> startDate,
+            @Parameter(description = "End date for filtering the readings") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> endDate
     ) {
-        return status(HttpStatus.OK).body(sensorReadingService.queryData(sensorIds, metrics, statistic, startDate, endDate));
+        SensorQueryResponseWrapper response = sensorReadingService.queryData(sensorIds, metrics, statistic, startDate, endDate);
+        return ResponseEntity.ok(response);
     }
-
-
 }
-

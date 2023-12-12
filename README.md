@@ -53,9 +53,11 @@ while also benefiting from TimescaleDB's time-series functionalities.
 
 ## Missing Parts
 
-TimescaleDB configuration requires more time
+TimescaleDB configuration requires more time and unfortunetly I couldn't complete this part
 
-## Next Steps
+Data validation is not as good as it should be but tried to cover important parts
+
+Logging is not on a good state.
 
 ## Technologies Used
 
@@ -76,7 +78,7 @@ Simplifying the database access layer by reducing the boilerplate code.
 
 ### Test Containers
 
-Easy testing with real container images
+Easy testing with container images
 
 ### OpenAPI (Swagger)
 Enabling seamless API documentation for better understanding and testing.

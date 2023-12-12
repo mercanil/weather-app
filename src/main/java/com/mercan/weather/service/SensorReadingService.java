@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +34,7 @@ public class SensorReadingService {
                 .temperature(dto.getTemperature())
                 .humidity(dto.getHumidity())
                 .windSpeed(dto.getWindSpeed())
-                .time(new Timestamp(System.currentTimeMillis()))
+                .readingTime(LocalDate.now())
                 .build();
 
         sensorReadingRepository.save(reading);

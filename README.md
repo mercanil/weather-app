@@ -19,6 +19,8 @@ Please make sure you have docker installed in your environment to run this appli
 | GET        | /api/sensor/    | Get all sensors                     |
 | PUT        | /api/sensor/:id | Update sensor for given id          |
 | DELETE     | /api/sensor/:id | Delete sensor for given id          |
+| POST       | /api/reading    | Create new sensor reading           |
+| GET        | /api/reading    | query sensor reading                |
 
 ![Alt text](./docs/swagger-weather-service.png "API definition screenshot")
 ![Alt text](./docs/weather-service-sd.png "system design screenshot")
@@ -33,17 +35,17 @@ swagger-ui: `http://127.0.0.1/swagger-ui.html`
 
 ## Database Selection TimescaleDB
 
-### Time-Series Data Optimization
+#### Time-Series Data Optimization
 
 TimescaleDB is built on top of PostgreSQL and is optimized for time-series data. This is particularly beneficial for our
 application, which deals extensively with sensor data, inherently time-series in nature.
 
-### Rich Query Capabilities
+#### Rich Query Capabilities
 
 By inheriting PostgreSQL's features, TimescaleDB allows us to use complex SQL queries, which is crucial for our data
 analysis and reporting needs.
 
-### Compatibility with PostgreSQL
+#### Compatibility with PostgreSQL
 
 Since TimescaleDB is an extension of PostgreSQL, it allows us to use the vast array of PostgreSQL tools and features,
 while also benefiting from TimescaleDB's time-series functionalities.

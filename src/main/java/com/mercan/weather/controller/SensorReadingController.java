@@ -60,7 +60,7 @@ public class SensorReadingController {
     public ResponseEntity<SensorQueryResponseWrapper> query(
             @Parameter(description = "Set of sensor IDs to filter the readings") @RequestParam(required = false) Optional<Set<UUID>> sensorIds,
             @Parameter(description = "List of metrics to include in the response, e.g., 'temperature', 'humidity'") @RequestParam @NotEmpty List<String> metrics,
-            @Parameter(description = "Statistic type for aggregating the data, e.g., 'AVERAGE', 'SUM'") @RequestParam(name = "statistic", defaultValue = "AVG", required = false) String statistic,
+            @Parameter(description = "Statistic type for aggregating the data, e.g., 'AVERAGE', 'SUM'") @RequestParam(name = "statistic", defaultValue = "AVERAGE", required = false) String statistic,
             @Parameter(description = "Start date for filtering the readings") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> startDate,
             @Parameter(description = "End date for filtering the readings") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Optional<LocalDate> endDate
     ) {

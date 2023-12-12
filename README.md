@@ -20,8 +20,9 @@ Please make sure you have docker installed in your environment to run this appli
 | PUT        | /api/sensor/:id | Update sensor for given id          |
 | DELETE     | /api/sensor/:id | Delete sensor for given id          |
 
-![Alt text](docs\swagger-weather-service.png "API definition screenshot")
-![Alt text](docs\weather-service-sd.png "system design screenshot")
+![Alt text](./docs/swagger-weather-service.png "API definition screenshot")
+![Alt text](./docs/weather-service-sd.png "system design screenshot")
+
 
 ## API Usage (Swagger UI Documentation)
 The API documentation can be found on Swagger UI. To view it, please visit: Swagger UI.
